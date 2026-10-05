@@ -1,25 +1,24 @@
 from openai import OpenAI
 from dotenv import load_dotenv
 import os
-from tool_manager import get_user_tool, read_text_file
 from retriever import load_documents
+from test_embedding import create_embedding
+from similarity import cosine_similarity
 
-def embeddings():
+#load the configuration 
+load_dotenv()
 
-    return ""
 
-
+# 1. First load all the documents
 documents  = load_documents()
 
-embedded = {}
+# 2. Generate embedding for all the documents
+document_embedding = {}
 
-for fileName, content in documents :
-    embedded(fileName) = 
+for fileName, content in documents.items(         ) :
+    document_embedding[fileName] = create_embedding(content)
 
-
-embedded = embeddings()
-
-
+# Prints the AI output
 def show_the_response(response):
     ai_reply = ""    
     print("AI: ", end="", flush=True)
@@ -35,9 +34,6 @@ def show_the_response(response):
     print()
     return ai_reply
 
-#load the configuration 
-load_dotenv()
-
 #create a client that communicates with the Ollama 
 client = OpenAI(
     base_url=os.getenv("BASE_URL"),
@@ -48,73 +44,60 @@ print("="*40)
 print("                 My Assistance ")
 print("="*40)
 
-roles = {
-    "1": "You are a friendly school teacher. Explain every concept using simple language and real-life examples.",
-
-    "2": "You are a senior Python developer. Explain programming concepts clearly and always include Python examples.",
-
-    "3": "You are an experienced travel guide. Recommend places, food, transportation and travel tips.",
-
-    "4": "You are a motivational coach. Encourage the user and give practical advice with a positive attitude.",
-
-    "5": "You are a professional interviewer. Ask one interview question at a time and provide feedback after each answer."
-}
-
-
-print("\nChoose Your Assistant\n")
-
-print("1. Teacher")
-print("2. Python Expert")
-print("3. Travel Guide")
-print("4. Motivational Coach")
-print("5. Interviewer")
-
-choice = input("\nEnter your choice : ")
-
-messages = [
-    {
-        "role": "system",
-        "content": roles.get(
-            choice,
-            "You are a helpful AI assistant."
-        )
-    }
-]
-
-#Send the request to the model
 while True:
 
     print()
     user_input = input("You : ")
 
     text = user_input.lower()
-
-    result = ""
-
-    if result:
-        print("AI: ", result)
-        continue
-
-    messages.append(
-        {
-            "role":"user",
-            "content": user_input
-        }
-    )
-
-    if user_input.lower() == "quit":
+    if text == "quit":
         print("AI: Good bye!")
         break
+
+    # Generate embedded vector for user question
+
+    question_embedding  = create_embedding(text)
+
+    # Now loop each document embedding to search the similarity 
+
+    best_file = ""
+    best_score = -1
+
+    for fileName, embedding in document_embedding.items():
+
+        score = cosine_similarity( embedding, question_embedding)
+
+        if score > best_score:
+            best_score = score
+            best_file = fileName
+
+
+    # now we know the content:
+    context  = documents[best_file]
+
+    prompt = f"""
+        Answer the question using only
+        the following information.
+        Context:
+        {context}
+        Question:
+        {user_input}
+    """
+
+    messages=[
+            {
+                "role": "user",
+                "content": prompt
+            }
+        ]
+
+    
 
     response = client.chat.completions.create(
         model=os.getenv("MODEL"),
         messages=messages,
         stream=True
     )
-
-    # ai_reply = response.choices[0].message.content
-    # # Display the response
-    # print("AI : ", ai_reply)
 
     ai_reply = show_the_response(response)    
     messages.append(
@@ -123,10 +106,3 @@ while True:
             "content": ai_reply
         }
     )
-
-    # print("="*40)
-    # print("                 Conversation History ")
-    # for message in messages:
-    #     print(f"{message['role'].title()} : {message['content']}")
-    #     print("\n")
-    # print("="*40)
