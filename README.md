@@ -40,3 +40,7 @@ API_KEY= ollama
 MODEL= qwen3:1.
 
 
+### MCP Server Day 8
+pip install fastmcp
+pip show fastmcp
+
