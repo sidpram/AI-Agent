@@ -18,8 +18,9 @@ async def main():
 
     for tool in tools:
 
-        print(tool.name)
+        print(tool.name, ":")
         print(tool.description)
+        print()
 
     print()
 

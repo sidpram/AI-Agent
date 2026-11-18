@@ -7,7 +7,7 @@ mcp = FastMCP("Time Server")
 @mcp.tool()
 def current_time():
 
-    """Return the current date and time."""
+    """Return the current date and time.""" #tool Description also known as DocString
 
     return datetime.now().strftime(
         "%d-%m-%Y %H:%M:%S"

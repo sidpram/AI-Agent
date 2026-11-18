@@ -7,7 +7,7 @@ async def connect():
     Connect to the MCP Server.
     """
 
-    client = Client("server.py")
+    client = Client("server.py")  # may the url
 
     await client.__aenter__()
 
