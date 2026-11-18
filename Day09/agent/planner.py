@@ -1,5 +1,3 @@
-import asyncio
-
 from openai import OpenAI
 from dotenv import load_dotenv
 import os
@@ -13,27 +11,19 @@ client = OpenAI(
     api_key=os.getenv("API_KEY")
 )
 
-
-from mcp_client import (
-    connect,
-    disconnect,
-    discover_tools,
-    execute_tool
-)
-
 # Build Tool Descriptions
 def build_tool_descriptions(tools):
 
     descriptions = ""
     for tool in tools:
         descriptions += f"""
-        Tool:
-        {tool.name}
+Tool:
+{tool.name}
 
-        Description:
-        {tool.description}
-        ----------------------------
-        """
+Description:
+{tool.description}
+----------------------------
+"""
     return descriptions
 
 
@@ -41,22 +31,27 @@ def planner(state, tools):
 
     tool_descriptions = build_tool_descriptions(tools)
     prompt = f"""
-    you are an AI planner.
-    You job is to decide ONLY the next action.
-    User Request: 
-    {state["user_request"]}
-    Completed Action:
-    {state["action"]}
-    Previous Observation:
-    {state["observation"]}
-    Available tools:
-    {tool_descriptions}
+you are an AI planner.
+You job is to decide ONLY the next action.
+User Request: 
+{state["user_request"]}
+Completed Action:
+{state["actions"]}
+Previous Observation:
+{state["observations"]}
+Available tools:
+{tool_descriptions}
 
 Rules:
-1. Select the best tool.
-    2. Reply ONLY with the tool name.
-    3. Do not explain.
 
+1. Choose only ONE next action.
+2. Never repeat an action that has already been completed.
+3. Use the observations to decide what is still required.
+4. If the user's request has been completely satisfied, return FINISH.
+5. Return ONLY the tool name or FINISH.
+6. Do not explain your answer.
+
+Next Action:
 """
 
     # Give this prompt to ollama
