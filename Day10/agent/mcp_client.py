@@ -1,5 +1,5 @@
 from fastmcp import Client
-
+from pathlib import Path
 
 async def connect():
 
@@ -7,7 +7,9 @@ async def connect():
     Connect to the MCP Server.
     """
 
-    client = Client("server.py")  # may the url
+    SERVER_PATH = Path(__file__).resolve().with_name("server.py")
+
+    client = Client(SERVER_PATH)
 
     await client.__aenter__()
 

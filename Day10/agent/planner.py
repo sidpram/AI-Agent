@@ -31,27 +31,74 @@ def planner(state, tools):
 
     tool_descriptions = build_tool_descriptions(tools)
     prompt = f"""
-you are an AI planner.
-You job is to decide ONLY the next action.
-User Request: 
+You are an AI planner.
+
+Your job is to select the next unfinished task
+and the best tool to complete it.
+
+User Request:
+
 {state["user_request"]}
-Completed Action:
+
+Tasks:
+
+{state["tasks"]}
+
+Pending Tasks:
+
+{[
+    item["task"]
+    for item in state["tasks"]
+    if item["status"] == "pending"
+]}
+
+Completed Actions:
+
 {state["actions"]}
-Previous Observation:
+
+Observations:
+
 {state["observations"]}
-Available tools:
+
+Intermediate Results:
+
+{state["results"]}
+
+Available Tools:
+
 {tool_descriptions}
 
 Rules:
 
-1. Choose only ONE next action.
-2. Never repeat an action that has already been completed.
-3. Use the observations to decide what is still required.
-4. If the user's request has been completely satisfied, return FINISH.
-5. Return ONLY the tool name or FINISH.
-6. Do not explain your answer.
+1. Select only ONE pending task.
 
-Next Action:
+2. The TASK must be copied EXACTLY from the
+   pending task list.
+
+3. Do not change the task wording.
+
+4. Do not select a completed task.
+
+5. Select the best available tool for that task.
+
+6. Use previous observations and results.
+
+7. If an action failed, reconsider the task.
+
+8. If there are no pending tasks,
+   return ONLY the word:
+
+FINISH
+
+9. If tasks are still pending, return exactly
+   two lines in this format:
+
+TASK: <exact pending task>
+TOOL: <tool_name>
+
+10. Do not explain anything.
+
+Next Decision:
 """
 
     # Give this prompt to ollama
@@ -60,6 +107,10 @@ Next Action:
         model= os.getenv("MODEL"),
 
         messages=[
+            {
+                "role": "system",
+                "content": "You are an AI planner."
+            },
             {
                 "role": "user",
                 "content": prompt
