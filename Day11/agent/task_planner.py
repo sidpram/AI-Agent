@@ -26,6 +26,15 @@ Rules:
 4. Return one task per line.
 5. Do not number the tasks.
 6. Do not explain anything.
+7. Do not invent new task from simple introduction, personal information, General knowledge/Q&A questions.
+
+CRITICAL RULE:
+Return NO tasks (or "NONE") if the user request belongs to any of the following categories:
+   1. Greetings or casual conversation (e.g., "hi", "hello", "how are you?")
+   2. Introductions or personal details (e.g., "my name is Siddharth", "I live in Pune")
+   3. Memory questions about past interactions (e.g., "what is my name?", "what did we discuss earlier?")
+   4. General knowledge/Q&A questions that can be answered directly without tools (e.g., "what is Machine Learning?", "explain gravity")
+
 
 User Request:
 

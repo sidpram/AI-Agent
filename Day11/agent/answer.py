@@ -36,6 +36,9 @@ Intermediate Results:
 {state["results"]}
 
 Give the user a natural and concise answer.
+Use relevant previous memories
+when they help answer the user's question.
+
 
 Do not mention:
 - planner

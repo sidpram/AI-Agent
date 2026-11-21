@@ -92,6 +92,7 @@ TASK: <exact pending task>
 TOOL: <tool_name>
 
 10. Do not explain anything.
+11. IF the request can be answered directly using conversational memory, standard knowledge, or if tasks list is empty/NONE, respond ONLY with: FINISH
 
 Next Decision:
 """

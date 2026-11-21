@@ -71,7 +71,11 @@ async def run_agent_loop(
     for memory in memories:
         add_memory(state=state, memory=memory)
 
-    # break the user request to smaller task
+    # --------------------------------
+    # Step 1: Decompose the goal
+    # # break the user request to smaller task
+    # --------------------------------
+
     planned_tasks = decompose_task(user_request)
 
     # Now add these planned task 
@@ -80,6 +84,7 @@ async def run_agent_loop(
         add_task(state, task)
 
     print("\nTask Planned")
+    print("---------")
     for item in state["tasks"]:
         print("-", item["task"], "- status", item["status"])
 

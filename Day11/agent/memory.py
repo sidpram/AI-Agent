@@ -98,7 +98,7 @@ def save_memory(user_message, assistant_message):
 def search_semantic_memories(
     query,
     top_k=3,
-    threshold=0.20
+    threshold=0.10
 ):
     query_embedding = create_embedding(query)
 
@@ -149,7 +149,7 @@ def search_semantic_memories(
         reverse=True
     )
 
-    #print(results)
+    print(results)
 
     return results[:top_k]
 
