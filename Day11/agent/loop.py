@@ -66,7 +66,7 @@ async def run_agent_loop(
 
     state = create_state(user_request)
 
-    memories = search_semantic_memories(user_request,top_k=3)
+    memories = search_semantic_memories(user_request, top_k=3)
 
     for memory in memories:
         add_memory(state=state, memory=memory)

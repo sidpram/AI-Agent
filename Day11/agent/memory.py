@@ -34,6 +34,15 @@ def create_database():
         )
     """)
 
+    cursor.execute("""
+            CREATE TABLE IF NOT EXISTS facts (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                fact_message TEXT,
+                embedding TEXT,
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+            )
+        """)
+
     connection.commit()
     connection.close()
 
@@ -94,6 +103,32 @@ def save_memory(user_message, assistant_message):
     connection.commit()
     connection.close()
 
+def save_semantic_memory(fact):
+    text = fact
+
+    embedding = create_embedding(text)    
+
+    connection = sqlite3.connect(DATABASE)
+    cursor = connection.cursor()
+
+    cursor.execute(
+        """
+        INSERT INTO facts
+        (
+            fact_message,
+            embedding
+        )
+        VALUES (?, ?)
+        """,
+        (
+            fact,
+            json.dumps(embedding)
+        )
+    )
+
+    connection.commit()
+    connection.close()
+
 
 def search_semantic_memories(
     query,
@@ -107,11 +142,10 @@ def search_semantic_memories(
 
     cursor.execute("""
         SELECT
-            user_message,
-            assistant_message,
+            fact_message,
             embedding,
             created_at
-        FROM memories
+        FROM facts
     """)
 
     rows = cursor.fetchall()
@@ -121,8 +155,7 @@ def search_semantic_memories(
     results = []
 
     for (
-        user_message,
-        assistant_message,
+        fact_message,
         embedding_json,
         created_at
     ) in rows:
@@ -138,8 +171,7 @@ def search_semantic_memories(
         
         if score >= threshold:
             results.append({
-                "user_message": user_message,
-                "assistant_message": assistant_message,
+                "user_message": fact_message,
                 "created_at": created_at,
                 "score": score
             })
