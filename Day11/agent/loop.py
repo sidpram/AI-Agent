@@ -15,8 +15,11 @@ from state import (
 from task_planner import decompose_task
 from memory import (
     search_semantic_memories,
-    save_memory
+    save_memory,
+    save_semantic_memory
     )
+
+from memory_extractor import extract_memory
 
 
 def parse_decision(decision):
@@ -149,7 +152,16 @@ async def run_agent_loop(
         if decision.strip().upper() == "FINISH":
 
             answer = format_answer(state)
-            save_memory(user_message=user_request,assistant_message=answer)
+            save_memory(user_request, answer)
+            
+            fact = extract_memory(
+            user_request,
+            answer
+            )
+
+            print("fact: ", fact)
+            if fact != "NONE":
+                save_semantic_memory(fact)
 
             finish(
                 state,
