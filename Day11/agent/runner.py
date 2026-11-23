@@ -38,15 +38,11 @@ async def main():
             client
         )
 
-        print("\nFinal Answer")
-        print("------------")
-
-        print(
-            state["final_answer"]
-        )
+        print("\nAssistant", state["final_answer"])
         user_request = input("\nUser : ")
     await disconnect(client)
-
+    print("Assistant: Bye, Have a nice day!")
+      
 
 if __name__ == "__main__":
     asyncio.run(main())
