@@ -28,22 +28,23 @@ async def main():
 
     user_request = input("\nUser : ")
 
-    state = await run_agent_loop(
-        user_request,
-        planner,
-        execute_action,
-        format_answer,
-        tools,
-        client
-    )
+    while user_request != "quit" and user_request != "bye":
+        state = await run_agent_loop(
+            user_request,
+            planner,
+            execute_action,
+            format_answer,
+            tools,
+            client
+        )
 
-    print("\nFinal Answer")
-    print("------------")
+        print("\nFinal Answer")
+        print("------------")
 
-    print(
-        state["final_answer"]
-    )
-
+        print(
+            state["final_answer"]
+        )
+        user_request = input("\nUser : ")
     await disconnect(client)
 
 
