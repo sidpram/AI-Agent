@@ -103,31 +103,49 @@ def save_memory(user_message, assistant_message):
     connection.commit()
     connection.close()
 
-def save_semantic_memory(fact):
-    text = fact
 
-    embedding = create_embedding(text)    
+def save_semantic_memory(fact):
 
     connection = sqlite3.connect(DATABASE)
     cursor = connection.cursor()
 
+    # Check exact duplicate
     cursor.execute(
         """
-        INSERT INTO facts
-        (
-            fact_message,
-            embedding
-        )
+        SELECT id
+        FROM facts
+        WHERE LOWER(TRIM(fact_message)) = LOWER(TRIM(?))
+        """,
+        (fact,)
+    )
+
+    existing = cursor.fetchone()
+
+    if existing:
+        connection.close()
+        print("Fact already exists. Skipping insertion.")
+        return False
+
+    # Generate embedding only for new facts
+    embedding = create_embedding(
+        fact,
+        input_type="passage"
+    )
+
+    cursor.execute(
+        """
+        INSERT INTO facts (fact_message, embedding)
         VALUES (?, ?)
         """,
-        (
-            fact,
-            json.dumps(embedding)
-        )
+        (fact, json.dumps(embedding))
     )
 
     connection.commit()
     connection.close()
+
+    print("New fact saved successfully.")
+    return True
+
 
 
 def search_semantic_memories(

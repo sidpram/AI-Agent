@@ -29,92 +29,95 @@ Description:
 
 def planner(state, tools):
 
-    tool_descriptions = build_tool_descriptions(tools)
-    prompt = f"""
-You are an AI planner.
+    if not state["tasks"]:
+        return "FINISH"
+    else: 
+        tool_descriptions = build_tool_descriptions(tools)
+        prompt = f"""
+    You are an AI planner.
 
-Your job is to select the next unfinished task
-and the best tool to complete it.
+    Your job is to select the next unfinished task
+    and the best tool to complete it.
 
-User Request:
-{state["user_request"]}
+    User Request:
+    {state["user_request"]}
 
-Relevant Previous Memories:
-{state["memories"]}
+    Relevant Previous Memories:
+    {state["memories"]}
 
-Tasks:
-{state["tasks"]}
+    Tasks:
+    {state["tasks"]}
 
-Pending Tasks:
-{[
-    item["task"]
-    for item in state["tasks"]
-    if item["status"] == "pending"
-]}
+    Pending Tasks:
+    {[
+        item["task"]
+        for item in state["tasks"]
+        if item["status"] == "pending"
+    ]}
 
-Completed Actions:
-{state["actions"]}
+    Completed Actions:
+    {state["actions"]}
 
-Observations:
-{state["observations"]}
+    Observations:
+    {state["observations"]}
 
-Intermediate Results:
-{state["results"]}
+    Intermediate Results:
+    {state["results"]}
 
-Available Tools:
-{tool_descriptions}
+    Available Tools:
+    {tool_descriptions}
 
-Rules:
+    Rules:
 
-1. Select only ONE pending task.
+    1. Select only ONE pending task.
 
-2. The TASK must be copied EXACTLY from the pending task list.
+    2. The TASK must be copied EXACTLY from the pending task list.
 
-3. Do not change the task wording.
+    3. Do not change the task wording.
 
-4. Do not select a completed task.
+    4. Do not select a completed task.
 
-5. Select the best available tool for that task.
+    5. Select the best available tool for that task.
 
-6. Use previous observations, relevant memories and results.
+    6. Use previous observations, relevant memories and results.
 
-7. If an action failed, reconsider the task.
+    7. If an action failed, reconsider the task.
 
-8. If there are no pending tasks,
-   return ONLY the word:
+    8. If there are no pending tasks,
+    return ONLY the word:
 
-FINISH
+    FINISH
 
-9. If tasks are still pending, return exactly
-   two lines in this format:
+    9. If tasks are still pending, return exactly
+    two lines in this format:
 
-TASK: <exact pending task>
-TOOL: <tool_name>
+    TASK: <exact pending task>
+    TOOL: <tool_name>
 
-10. Do not explain anything.
-11. IF the request can be answered directly using conversational memory, standard knowledge, or if tasks list is empty/NONE, respond ONLY with: FINISH
+    10. Do not explain anything.
+    11. IF the request can be answered directly using conversational memory, standard knowledge, or if tasks list is empty/NONE, respond ONLY with: FINISH
 
-Next Decision:
-"""
+    Next Decision:
+    """
 
-    # Give this prompt to ollama
-    response = client.chat.completions.create (
+        # Give this prompt to ollama
+        response = client.chat.completions.create (
 
-        model= os.getenv("MODEL"),
+            model= os.getenv("MODEL"),
 
-        messages=[
-            {
-                "role": "system",
-                "content": "You are an AI planner."
-            },
-            {
-                "role": "user",
-                "content": prompt
-            }
-        ]
-    )
+            messages=[
+                # {
+                #     "role": "system",
+                #     "content": "You are an AI planner."
+                # },
+                {
+                    "role": "user",
+                    "content": prompt
+                }
+            ]
+        )
 
-    #Ollama returns the tool name
-    tool_name = response.choices[0].message.content
+        #Ollama returns the tool name
+        tool_name = response.choices[0].message.content
 
-    return tool_name.strip()
+        return tool_name.strip()

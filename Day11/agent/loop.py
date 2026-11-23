@@ -108,15 +108,11 @@ async def run_agent_loop(
                 f"{state['current_step'] + 1} ---"
             )
 
-            print(
-                "Planner Decision:"
-            )
+            print("Planner Decision:")
 
             print("TASK: FINISH")
 
-            answer = format_answer(
-                state
-            )
+            answer = format_answer(state)
 
             finish(
                 state,
@@ -133,16 +129,10 @@ async def run_agent_loop(
         # --------------------------------
         # Ask planner for next task
         # --------------------------------
-
-        decision = planner(
-            state,
-            tools
-        )
-
-        print(
-            "Planner Decision:"
-        )
-
+        print("\nTools: ", tools)
+        decision = planner(state, tools)
+        print("---------")
+        print("\nPlanner Decision:")
         print(decision)
 
         # --------------------------------
@@ -152,8 +142,13 @@ async def run_agent_loop(
         if decision.strip().upper() == "FINISH":
 
             answer = format_answer(state)
-            save_memory(user_request, answer)
             
+            finish(
+                state,
+                answer
+            )
+            save_memory(user_request, answer)
+                        
             fact = extract_memory(
             user_request,
             answer
@@ -162,11 +157,6 @@ async def run_agent_loop(
             print("fact: ", fact)
             if fact != "NONE":
                 save_semantic_memory(fact)
-
-            finish(
-                state,
-                answer
-            )
 
             break
 

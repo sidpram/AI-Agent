@@ -38,7 +38,7 @@ async def main():
             client
         )
 
-        print("\nAssistant", state["final_answer"])
+        print("\nAssistant: ", state["final_answer"])
         user_request = input("\nUser : ")
     await disconnect(client)
     print("Assistant: Bye, Have a nice day!")
