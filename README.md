@@ -44,3 +44,5 @@ MODEL= qwen3:1.
 pip install fastmcp
 pip show fastmcp
 
+### Day 12
+pip install chromadb
