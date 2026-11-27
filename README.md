@@ -46,3 +46,6 @@ pip show fastmcp
 
 ### Day 12
 pip install chromadb
+
+### Day 13
+pip install requests
